@@ -1,26 +1,112 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import './App.css'
+import axios from 'axios'
+
+type Posts = {
+  comments: Comments[]
+  limit: number
+  skip: number
+  total: number
 }
 
-export default App;
+type Comments = {
+  body: string
+  id: number
+  postId: number
+  user: User
+}
+
+type User = {
+  id: number
+  username: string
+}
+
+function App() {
+  const [posts, setPosts] = React.useState<Posts>({
+    comments: [],
+    limit: 30,
+    skip: 0,
+    total: 340,
+  })
+
+  const [newPostBody, setNewPostBody] = React.useState(() => {
+    const savedPostBody = localStorage.getItem('newPostBody')
+    return savedPostBody || ''
+  })
+
+  React.useEffect(() => {
+    axios
+      .get('https://dummyjson.com/comments')
+      .then((res) => setPosts(res.data))
+      .catch((err) => console.log(err))
+  }, [])
+
+  const deletePost = (postId: number) => {
+    setPosts((prevPost) => ({
+      ...prevPost,
+      comments: prevPost.comments.filter((post) => post.id !== postId),
+    }))
+  }
+
+  const addPost = () => {
+    const newPost = {
+      body: newPostBody,
+      id: Date.now(),
+      postId: Date.now(),
+      user: {
+        id: Date.now(),
+        username: 'John Doe',
+      },
+    }
+
+    if (newPostBody) {
+      setPosts((prevPosts) => ({
+        ...prevPosts,
+        comments: [newPost, ...prevPosts.comments],
+      }))
+
+      setNewPostBody('')
+    }
+  }
+
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = event.target
+    setNewPostBody(value)
+    localStorage.setItem('newPostBody', value)
+  }
+
+  return (
+    <div className='App'>
+      {posts.comments.slice(0, 3).map((post) => (
+        <div key={post.id} className='message'>
+          <div className='message__logo'>
+            <h3>{post.user.username}</h3>
+          </div>
+
+          <div className='message__text'>{post.body}</div>
+
+          <button
+            onClick={() => deletePost(post.id)}
+            className='message__button'
+          >
+            X
+          </button>
+        </div>
+      ))}
+
+      <div className='form'>
+        <textarea
+          className='form__text'
+          value={newPostBody}
+          onChange={handleChange}
+        ></textarea>
+        <button type='submit' className='form__button' onClick={addPost}>
+          Send
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default App
