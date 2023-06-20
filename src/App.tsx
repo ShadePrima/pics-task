@@ -98,6 +98,7 @@ function App() {
       <div className='form'>
         <textarea
           className='form__text'
+          placeholder='Lorem ipsum'
           value={newPostBody}
           onChange={handleChange}
         ></textarea>
