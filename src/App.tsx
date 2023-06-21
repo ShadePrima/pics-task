@@ -102,7 +102,12 @@ function App() {
           value={newPostBody}
           onChange={handleChange}
         ></textarea>
-        <button type='submit' className='form__button' onClick={addPost}>
+        <button
+          type='submit'
+          style={{ backgroundColor: newPostBody ? '#5d9ce6' : '' }}
+          className='form__button'
+          onClick={addPost}
+        >
           Send
         </button>
       </div>
