@@ -63,7 +63,7 @@ function App() {
     if (newPostBody) {
       setPosts((prevPosts) => ({
         ...prevPosts,
-        comments: [newPost, ...prevPosts.comments],
+        comments: [...prevPosts.comments, newPost],
       }))
 
       setNewPostBody('')
@@ -78,7 +78,7 @@ function App() {
 
   return (
     <div className='App'>
-      {posts.comments.slice(0, 3).map((post) => (
+      {posts.comments.slice(-3).map((post) => (
         <div key={post.id} className='message'>
           <div className='message__logo'>
             <h3>{post.user.username}</h3>
